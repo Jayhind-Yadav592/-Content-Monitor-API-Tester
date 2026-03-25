@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Monitor — API Tester</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,400;0,500;0,600;1,100;1,300;1,400;1,500&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --surface: #12121a;
+            --card: #1a1a26;
+            --border: #2a2a3d;
+            --accent: #7c6aff;
+            --text: #e8e8f0;
+            --muted: #6b6b8a;
+            --green: #6affd4;
+            --yellow: #ffd96a;
+            --red: #ff6a8e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg);
+        }
+
+        .logo {
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+            background: linear-gradient(135deg, var(--accent), var(--green));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        header span {
+            font-size: 0.8rem;
+            color: var(--muted);
+            font-family: 'Roboto', monospace;
+            margin-left: auto;
+            background: var(--surface);
+            padding: 0.3rem 0.7rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+        }
+
+        /* ===== TOP BAR ===== */
+        #topbar {
+            margin: 0.5rem 1rem;
+            padding: 0.45rem 0.8rem;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Roboto', monospace;
+            font-size: 0.82rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        #topbar .lbl {
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        #tbMethod {
+            font-weight: 700;
+            padding: 0.12rem 0.45rem;
+            border-radius: 4px;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        #tbPath {
+            color: var(--text);
+            word-break: break-all;
+            font-family: 'Roboto', monospace;
+        }
+
+        /* ===== MOBILE NAV ===== */
+        .mobile-nav {
+            display: none;
+            padding: 0.5rem 1rem;
+            gap: 0.4rem;
+            overflow-x: auto;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg);
+        }
+
+        .mobile-nav::-webkit-scrollbar {
+            height: 2px;
+        }
+
+        .mnbtn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--muted);
+            font-family: 'Roboto', monospace;
+            font-size: 0.75rem;
+            padding: 0.35rem 0.6rem;
+            cursor: pointer;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .mnbtn.active {
+            border-color: var(--accent);
+            color: var(--text);
+            background: rgba(124, 106, 255, 0.15);
+        }
+
+        /* ===== LAYOUT ===== */
+        .main {
+            display: grid;
+            grid-template-columns: 200px 1fr 280px;
+            height: calc(100vh - 108px);
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            padding: 0.4rem 0;
+        }
+
+        .sec {
+            padding: 0.4rem 0.8rem 0.1rem;
+            font-size: 0.78rem;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 0.4rem;
+        }
+
+        .ebtn {
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.45rem 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: var(--text);
+            transition: background 0.1s;
+        }
+
+        .ebtn:hover {
+            background: rgba(124, 106, 255, 0.08);
+        }
+
+        .ebtn.active {
+            background: rgba(124, 106, 255, 0.18);
+            border-right: 2px solid var(--accent);
+        }
+
+        .badge {
+            font-family: 'Roboto', monospace;
+            font-size: 0.64rem;
+            font-weight: 700;
+            padding: 0.1rem 0.3rem;
+            border-radius: 3px;
+            min-width: 36px;
+            text-align: center;
+        }
+
+        .GET {
+            background: rgba(106, 255, 212, 0.15);
+            color: var(--green);
+        }
+
+        .POST {
+            background: rgba(124, 106, 255, 0.2);
+            color: var(--accent);
+        }
+
+        .PATCH {
+            background: rgba(255, 217, 106, 0.15);
+            color: var(--yellow);
+        }
+
+        .elbl {
+            font-size: 0.8rem;
+            font-family: 'Roboto', monospace;
+            color: var(--muted);
+        }
+
+        .ebtn.active .elbl {
+            color: var(--text);
+        }
+
+        /* ===== CENTER ===== */
+        .center {
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        #ptitle {
+            font-size: 0.99rem;
+            font-weight: 600;
+        }
+
+        #pdesc {
+            font-size: 0.85rem;
+            color: var(--muted);
+            font-family: 'Roboto', monospace;
+            margin-top: 0.1rem;
+        }
+
+        .urlrow {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .urlbox {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.4rem 0.6rem;
+            font-family: 'Roboto', monospace;
+            font-size: 0.82rem;
+            overflow: hidden;
+        }
+
+        #upath {
+            color: var(--text);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .sendbtn {
+            background: linear-gradient(135deg, var(--accent), #5c4ecc);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 0.88rem;
+            white-space: nowrap;
+        }
+
+        .sendbtn:hover {
+            opacity: 0.85;
+        }
+
+        .sendbtn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* ===== FLAG ID BOX ===== */
+        #flagBox {
+            display: none;
+            background: #1a1600;
+            border: 2px solid var(--yellow);
+            border-radius: 8px;
+            padding: 0.7rem;
+        }
+
+        #flagBox label {
+            font-size: 0.75rem;
+            color: var(--yellow);
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            display: block;
+            margin-bottom: 0.35rem;
+        }
+
+        #flagId {
+            width: 100%;
+            background: var(--surface);
+            border: 1px solid var(--yellow);
+            border-radius: 6px;
+            color: var(--text);
+            font-family: 'Roboto', monospace;
+            font-size: 0.95rem;
+            padding: 0.5rem;
+            outline: none;
+        }
+
+        /* ===== BODY BOX ===== */
+        #bodyBox label {
+            font-size: 0.75rem;
+            color: var(--muted);
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+
+        #reqBody {
+            width: 100%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: 'Roboto', monospace;
+            font-size: 0.88rem;
+            padding: 0.65rem;
+            outline: none;
+            resize: vertical;
+            min-height: 75px;
+        }
+
+        #reqBody:focus {
+            border-color: var(--accent);
+        }
+
+        /* ===== GUIDE ===== */
+        .guide {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.7rem;
+        }
+
+        .guide h3 {
+            font-size: 0.72rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.5rem;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+        }
+
+        .sitem {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            padding: 0.4rem;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.1s;
+        }
+
+        .sitem:last-child {
+            border-bottom: none;
+        }
+
+        .sitem:hover {
+            background: rgba(124, 106, 255, 0.07);
+        }
+
+        .snum {
+            min-width: 18px;
+            height: 18px;
+            background: rgba(124, 106, 255, 0.25);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--accent);
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .stxt {
+            font-size: 0.78rem;
+            color: var(--muted);
+            font-family: 'Roboto', monospace;
+            line-height: 1.4;
+        }
+
+        .stxt strong {
+            color: var(--text);
+        }
+
+        /* ===== RESPONSE ===== */
+        .rpanel {
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .rheader {
+            padding: 0.65rem 0.8rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.78rem;
+            font-family: 'Roboto', monospace;
+            color: var(--muted);
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--muted);
+            flex-shrink: 0;
+        }
+
+        .dot.ok {
+            background: var(--green);
+            box-shadow: 0 0 5px var(--green);
+        }
+
+        .dot.err {
+            background: var(--red);
+            box-shadow: 0 0 5px var(--red);
+        }
+
+        .dot.spin {
+            background: var(--accent);
+            animation: pulse 0.7s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: 0.2
+            }
+        }
+
+        .rbody {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.8rem;
+            font-family: 'Roboto', monospace;
+            font-size: 0.8rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            color: var(--text);
+        }
+
+        .rbody.empty {
+            color: var(--muted);
+            font-style: italic;
+        }
+
+        .jk {
+            color: #7c6aff
+        }
+
+        .js {
+            color: #6affd4
+        }
+
+        .jn {
+            color: #ffd96a
+        }
+
+        .jb {
+            color: #ff6a8e
+        }
+
+        /* ===== MOBILE RESPONSE MODAL ===== */
+        .res-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 200;
+            flex-direction: column;
+        }
+
+        .res-modal.show {
+            display: flex;
+        }
+
+        .res-modal-header {
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--surface);
+        }
+
+        .res-modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            font-family: 'Roboto', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            color: var(--text);
+        }
+
+        .close-btn {
+            margin-left: auto;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.3rem 0.7rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 500;
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 3px;
+            height: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 900px) {
+            .main {
+                grid-template-columns: 180px 1fr;
+            }
+
+            .rpanel {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 0.90rem;
+            }
+
+            .main {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .mobile-nav {
+                display: flex;
+            }
+
+            .center {
+                padding: 0.8rem;
+            }
+
+            #topbar {
+                font-size: 0.69rem;
+            }
+
+            .rpanel {
+                display: none;
+            }
+
+            .sendbtn {
+                padding: 0.5rem 0.8rem;
+                font-size: 0.77rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">⚑</div>
+        <h1>Content Monitor — API Tester</h1>
+        <span>localhost:8000</span>
+    </header>
+
+    <!-- Top status bar -->
+    <div id="topbar">
+        <span class="lbl">CURRENT METHOD:</span>
+        <span id="tbMethod" class="badge POST">POST</span>
+        <span id="tbPath">/keywords/</span>
+        <span class="lbl" style="margin-left:auto">Select an endpoint → Click Send</span>
+    </div>
+
+    <!-- Mobile Navigation -->
+    <div class="mobile-nav" id="mobileNav">
+        <button class="mnbtn active" data-method="POST" data-path="/keywords/" data-title="Add Keyword"
+            data-desc="Add a keyword to monitor" data-body='{"name": "python"}'>
+            <span class="badge POST" style="font-size:0.5rem">POST</span>/keywords/
+        </button>
+        <button class="mnbtn" data-method="GET" data-path="/keywords/" data-title="List Keywords"
+            data-desc="Get all keywords" data-body="">
+            <span class="badge GET" style="font-size:0.5rem">GET</span>/keywords/
+        </button>
+        <button class="mnbtn" data-method="POST" data-path="/scan/load-mock/" data-title="Load Mock Data"
+            data-desc="Load 8 sample articles" data-body="">
+            <span class="badge POST" style="font-size:0.5rem">POST</span>/load-mock/
+        </button>
+        <button class="mnbtn" data-method="POST" data-path="/scan/" data-title="Run Scan"
+            data-desc="Scan content against keywords" data-body="">
+            <span class="badge POST" style="font-size:0.5rem">POST</span>/scan/
+        </button>
+        <button class="mnbtn" data-method="GET" data-path="/flags/" data-title="List Flags"
+            data-desc="Get all flags with scores" data-body="">
+            <span class="badge GET" style="font-size:0.5rem">GET</span>/flags/
+        </button>
+        <button class="mnbtn" data-method="PATCH" data-path="/flags/ID/" data-title="Update Flag"
+            data-desc="Mark flag as relevant or irrelevant" data-body='{"status": "irrelevant"}'>
+            <span class="badge PATCH" style="font-size:0.5rem">PATCH</span>/flags/{id}/
+        </button>
+        <button class="mnbtn" data-method="GET" data-path="/content/" data-title="List Content"
+            data-desc="View all articles" data-body="">
+            <span class="badge GET" style="font-size:0.5rem">GET</span>/content/
+        </button>
+    </div>
+
+    <div class="main">
+
+        <!-- Desktop Sidebar -->
+        <div class="sidebar">
+            <div class="sec">Keywords</div>
+            <button class="ebtn active" data-method="POST" data-path="/keywords/" data-title="Add Keyword"
+                data-desc="Add a keyword to monitor" data-body='{"name": "python"}'>
+                <span class="badge POST">POST</span><span class="elbl">/keywords/</span>
+            </button>
+            <button class="ebtn" data-method="GET" data-path="/keywords/" data-title="List Keywords"
+                data-desc="Get all keywords" data-body="">
+                <span class="badge GET">GET</span><span class="elbl">/keywords/</span>
+            </button>
+
+            <div class="sec">Mock Data</div>
+            <button class="ebtn" data-method="POST" data-path="/scan/load-mock/" data-title="Load Mock Data"
+                data-desc="Load 8 sample articles into DB" data-body="">
+                <span class="badge POST">POST</span><span class="elbl">/scan/load-mock/</span>
+            </button>
+
+            <div class="sec">Scanner</div>
+            <button class="ebtn" data-method="POST" data-path="/scan/" data-title="Run Scan"
+                data-desc="Scan all content against keywords" data-body="">
+                <span class="badge POST">POST</span><span class="elbl">/scan/</span>
+            </button>
+
+            <div class="sec">Flags</div>
+            <button class="ebtn" data-method="GET" data-path="/flags/" data-title="List Flags"
+                data-desc="Get all flags with scores" data-body="">
+                <span class="badge GET">GET</span><span class="elbl">/flags/</span>
+            </button>
+            <button class="ebtn" data-method="PATCH" data-path="/flags/ID/" data-title="Update Flag Status"
+                data-desc="Mark flag as relevant or irrelevant" data-body='{"status": "irrelevant"}'>
+                <span class="badge PATCH">PATCH</span><span class="elbl">/flags/{id}/</span>
+            </button>
+
+            <div class="sec">Content</div>
+            <button class="ebtn" data-method="GET" data-path="/content/" data-title="List Content Items"
+                data-desc="View all imported articles" data-body="">
+                <span class="badge GET">GET</span><span class="elbl">/content/</span>
+            </button>
+        </div>
+
+        <!-- Center Panel -->
+        <div class="center">
+            <div>
+                <div id="ptitle">Add Keyword</div>
+                <div id="pdesc">POST /keywords/ — Add a keyword to monitor</div>
+            </div>
+
+            <div class="urlrow">
+                <div class="urlbox">
+                    <span class="badge POST" id="ubadge">POST</span>
+                    <span id="upath">/keywords/</span>
+                </div>
+                <button class="sendbtn" id="sendBtn">▶ Send</button>
+            </div>
+
+            <!-- Flag ID Box -->
+            <div id="flagBox">
+                <label>⚠ Flag ID — Get the ID from GET /flags/ and enter it below</label>
+                <input type="text" id="flagId" placeholder="Enter flag ID — e.g: 1" />
+            </div>
+
+            <!-- Request Body -->
+            <div id="bodyBox">
+                <label>Request Body (JSON)</label>
+                <textarea id="reqBody" rows="4">{"name": "python"}</textarea>
+            </div>
+
+            <!-- Quick Guide -->
+            <div class="guide">
+                <h3>⚡ Correct Testing Order</h3>
+                <div class="sitem" data-step="1">
+                    <div class="snum">1</div>
+                    <div class="stxt"><strong>POST /keywords/</strong> — Add keywords: python, django, automation</div>
+                </div>
+                <div class="sitem" data-step="2">
+                    <div class="snum">2</div>
+                    <div class="stxt"><strong>POST /scan/load-mock/</strong> — Load 8 sample articles into database
+                    </div>
+                </div>
+                <div class="sitem" data-step="3">
+                    <div class="snum">3</div>
+                    <div class="stxt"><strong>POST /scan/</strong> — Run scan, flags will be created</div>
+                </div>
+                <div class="sitem" data-step="4">
+                    <div class="snum">4</div>
+                    <div class="stxt"><strong>GET /flags/</strong> — View all flags and note their IDs</div>
+                </div>
+                <div class="sitem" data-step="5">
+                    <div class="snum">5</div>
+                    <div class="stxt"><strong>PATCH /flags/ID/</strong> — Enter ID in the box above → Click Send!</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Desktop Response Panel -->
+        <div class="rpanel">
+            <div class="rheader">
+                <div class="dot" id="rdot"></div>
+                <span id="rstatus">Response will appear here...</span>
+            </div>
+            <div class="rbody empty" id="rbody">Select an endpoint → Click ▶ Send</div>
+        </div>
+
+    </div>
+
+    <!-- Mobile Response Modal -->
+    <div class="res-modal" id="resModal">
+        <div class="res-modal-header">
+            <div class="dot" id="rdot2"></div>
+            <span id="rstatus2"
+                style="font-family:'Roboto',monospace;font-size:0.72rem;color:var(--muted)">Response</span>
+            <button class="close-btn" onclick="document.getElementById('resModal').classList.remove('show')">✕
+                Close</button>
+        </div>
+        <div class="res-modal-body" id="rbody2">Response will appear here...</div>
+    </div>
+
+    <script>
+        var METHOD = 'POST';
+        var PATH = '/keywords/';
+
+        function initButtons(selector) {
+            document.querySelectorAll(selector).forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    loadEndpoint(
+                        btn, selector,
+                        btn.getAttribute('data-method'),
+                        btn.getAttribute('data-path'),
+                        btn.getAttribute('data-title'),
+                        btn.getAttribute('data-desc'),
+                        btn.getAttribute('data-body')
+                    );
+                });
+            });
+        }
+
+        initButtons('.ebtn');
+        initButtons('.mnbtn');
+
+        document.querySelectorAll('.sitem').forEach(function (item) {
+            item.addEventListener('click', function () {
+                var map = { 1: 0, 2: 2, 3: 3, 4: 4, 5: 5 };
+                var idx = map[parseInt(item.getAttribute('data-step'))];
+                if (idx !== undefined) document.querySelectorAll('.ebtn')[idx].click();
+            });
+        });
+
+        document.getElementById('sendBtn').addEventListener('click', sendRequest);
+        document.getElementById('flagId').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); sendRequest(); }
+        });
+
+        function loadEndpoint(btn, selector, method, path, title, desc, body) {
+            METHOD = method;
+            PATH = path;
+
+            document.querySelectorAll(selector).forEach(function (b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+
+            var tbm = document.getElementById('tbMethod');
+            tbm.textContent = method;
+            tbm.className = 'badge ' + method;
+            document.getElementById('tbPath').textContent = path;
+            document.getElementById('ptitle').textContent = title;
+            document.getElementById('pdesc').textContent = method + ' ' + path + ' — ' + desc;
+
+            var ub = document.getElementById('ubadge');
+            ub.textContent = method;
+            ub.className = 'badge ' + method;
+            document.getElementById('upath').textContent = path;
+
+            document.getElementById('bodyBox').style.display = (method === 'GET') ? 'none' : 'block';
+
+            var flagBox = document.getElementById('flagBox');
+            if (method === 'PATCH') {
+                flagBox.style.display = 'block';
+                document.getElementById('flagId').value = '';
+                document.getElementById('flagId').focus();
+            } else {
+                flagBox.style.display = 'none';
+            }
+
+            document.getElementById('reqBody').value = body || '';
+            document.getElementById('rbody').textContent = 'Click ▶ Send to make the request';
+            document.getElementById('rbody').className = 'rbody empty';
+            document.getElementById('rdot').className = 'dot';
+            document.getElementById('rstatus').textContent = method + ' — Ready';
+        }
+
+        function getCookie(name) {
+            var val = null;
+            if (document.cookie) {
+                document.cookie.split(';').forEach(function (c) {
+                    c = c.trim();
+                    if (c.indexOf(name + '=') === 0)
+                        val = decodeURIComponent(c.slice(name.length + 1));
+                });
+            }
+            return val;
+        }
+
+        function sendRequest() {
+            var base = 'http://localhost:8000';
+            var path = PATH;
+
+            if (METHOD === 'PATCH') {
+                var fid = document.getElementById('flagId').value.trim();
+                if (!fid) {
+                    alert('Please enter a Flag ID first!\nUse GET /flags/ to find the ID, then enter it here.');
+                    return;
+                }
+                path = '/flags/' + fid + '/';
+            }
+
+            var url = base + path;
+            var btn = document.getElementById('sendBtn');
+            var dot = document.getElementById('rdot');
+            var rs = document.getElementById('rstatus');
+            var rb = document.getElementById('rbody');
+
+            btn.disabled = true;
+            btn.textContent = '⏳ Sending...';
+            dot.className = 'dot spin';
+            rs.textContent = 'Sending ' + METHOD + ' ' + path;
+            rb.className = 'rbody empty';
+            rb.textContent = '';
+
+            var opts = {
+                method: METHOD,
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') || '' },
+                credentials: 'include'
+            };
+
+            if (METHOD !== 'GET') {
+                var b = document.getElementById('reqBody').value.trim();
+                if (b) {
+                    try { opts.body = JSON.stringify(JSON.parse(b)); }
+                    catch (e) { opts.body = b; }
+                }
+            }
+
+            fetch(url, opts)
+                .then(function (r) {
+                    var ok = r.ok; var st = r.status;
+                    return r.text().then(function (t) { return { ok: ok, st: st, t: t }; });
+                })
+                .then(function (r) {
+                    var parsed;
+                    try { parsed = JSON.parse(r.t); } catch (e) { parsed = r.t; }
+                    var html = highlight(parsed);
+
+                    dot.className = 'dot ' + (r.ok ? 'ok' : 'err');
+                    rs.textContent = 'HTTP ' + r.st + (r.ok ? ' ✅ Success!' : ' ❌ Error');
+                    rb.className = 'rbody';
+                    rb.innerHTML = html;
+
+                    if (window.innerWidth <= 900) {
+                        document.getElementById('rdot2').className = 'dot ' + (r.ok ? 'ok' : 'err');
+                        document.getElementById('rstatus2').textContent = 'HTTP ' + r.st + (r.ok ? ' ✅ Success!' : ' ❌ Error');
+                        document.getElementById('rbody2').innerHTML = html;
+                        document.getElementById('resModal').classList.add('show');
+                    }
+                })
+                .catch(function () {
+                    var msg = '❌ Could not connect to server!\nMake sure: python manage.py runserver is running.';
+                    dot.className = 'dot err';
+                    rs.textContent = 'Connection Error!';
+                    rb.className = 'rbody';
+                    rb.textContent = msg;
+
+                    if (window.innerWidth <= 900) {
+                        document.getElementById('rdot2').className = 'dot err';
+                        document.getElementById('rstatus2').textContent = 'Connection Error!';
+                        document.getElementById('rbody2').textContent = msg;
+                        document.getElementById('resModal').classList.add('show');
+                    }
+                })
+                .finally(function () {
+                    btn.disabled = false;
+                    btn.textContent = '▶ Send';
+                });
+        }
+
+        function highlight(obj) {
+            var j = typeof obj === 'string' ? obj : JSON.stringify(obj, null, 2);
+            return j.replace(
+                /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g,
+                function (m) {
+                    var c = 'jn';
+                    if (/^"/.test(m)) c = /:$/.test(m) ? 'jk' : 'js';
+                    else if (/true|false|null/.test(m)) c = 'jb';
+                    return '<span class="' + c + '">' + m + '</span>';
+                }
+            );
+        }
+    </script>
+</body>
+
+</html>
